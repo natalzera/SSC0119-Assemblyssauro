@@ -11,14 +11,17 @@ char dino[3][3] = {
     {' ', '%', '%'},
     {'%', '%', ' '}
 };
-int dinoY = 4;
+int dinoLen[2] = {3, 3};
+int dinoPos[2] = {8, 4};
+int dinoVelY = 0;
 
 // representação do cacto
 char cacto[2][3] = {
     {'#', '#', '#'},
     {'#', '#', '#'}
 };
-int cactoX = 36;
+int cactoLen[2] = {2, 3};
+int cactoPos[2] = {36, 4};
 
 
 // mostra o canvas do jogo
@@ -46,10 +49,71 @@ void cleanCanvas() {
 }
 
 // coloca um objeto no canvas dado as posições
-void putObj(char obj[][3], int nLines, int nCols, int x, int y) {
-    for (int i = 0; i < nLines; i ++)
-        for (int j = 0; j < nCols; j ++)
-            canvas[y+i][x+j] = obj[j][i];
+void putObj(char obj[][3], int len[2], int pos[2]) {
+    for (int i = 0; i < len[1]; i ++)
+        for (int j = 0; j < len[0]; j ++)
+            canvas[pos[1]+i][pos[0]+j] = obj[j][i];
+}
+
+// verifica se ocorreu alguma colisão entre o dinossauro e o cacto
+int collision() {
+    // eixo y
+    if (dinoPos[1] >= 3) {
+        // eixo x
+        if (dinoPos[0]+dinoLen[0]-1 >= cactoPos[0] && dinoPos[0] <= cactoPos[0])
+            return 1;
+        else if (dinoPos[0]+dinoLen[0]-1 >= cactoPos[0]+cactoLen[0]-1 && dinoPos[0] <= cactoPos[0]+cactoLen[0]-1)
+            return 1;
+    }
+    
+    return 0;
+}
+
+// atualiza a posição do cacto, simulando o dinossauro correr
+void runDino() {
+    cactoPos[0] -= 1;
+}
+
+// atualiza a velocidade do dinossauro, para ele pular
+void jumpDino() {
+    if (dinoPos[1] == 4)
+        dinoVelY = 6;
+}
+
+// atualiza a posição Y do dinossauro de acordo com sua velocidade
+void upadteYDino() {
+    // se está subindo
+    if (dinoVelY > 0 && dinoPos[1] > 1) {
+        dinoPos[1] -= 1;
+        dinoVelY -= 1;
+    }
+    
+    // se está no ar "parado"
+    else if (dinoVelY > 0) {
+        dinoVelY -= 1;
+    }
+    
+    // se está caindo
+    else if (dinoVelY == 0 && dinoPos[1] < 4) {
+        dinoPos[1] += 1;
+    }
+}
+
+// atualiza os parâmetros x e y dos objetos na tela
+void upadteXY() {
+    upadteYDino();
+    runDino();
+}
+
+// lê uma entrada do teclado para executar uma ação
+void input() {
+    char in = getchar();
+    
+    // comando de pulo
+    if (in == ' ') {
+        getchar();
+        jumpDino();
+    }
 }
 
 int main() {
@@ -62,13 +126,19 @@ int main() {
         cleanCanvas();
         
         // coloca os objetos e mostra a tela
-        putObj(dino, 3, 3, 3, dinoY);
-        putObj(cacto, 3, 2, cactoX, 4);
+        putObj(dino, dinoLen, dinoPos);
+        putObj(cacto, cactoLen, cactoPos);
         printCanvas();
         
+        // verifica colisões
+        if (collision())
+            gameOver = 1;
+        
         // atualiza
-        cactoX -= 1;
-        usleep(200000);
+        input();
+        upadteXY();
+        
+        //usleep(200000);
     }
     
     return 0;
