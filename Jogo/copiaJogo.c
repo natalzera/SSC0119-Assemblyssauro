@@ -21,7 +21,7 @@ char cacto[2][3] = {
     {'#', '#', '#'}
 };
 int cactoLen[2] = {2, 3};
-int cactoPos[2] = {36, 4};
+int cactoPos[2] = {42, 4};
 
 
 // mostra o canvas do jogo
@@ -71,7 +71,10 @@ int collision() {
 
 // atualiza a posição do cacto, simulando o dinossauro correr
 void runDino() {
-    cactoPos[0] -= 1;
+    if (cactoPos[0] > 0)
+        cactoPos[0] -= 1;
+    else
+        cactoPos[0] = 42;
 }
 
 // atualiza a velocidade do dinossauro, para ele pular
@@ -116,18 +119,53 @@ void input() {
     }
 }
 
+// mostra a tela de fim de jogo
+void endGame(int score) {
+    
+    system("clear");
+    cleanCanvas();
+    
+    canvas[2][14] = 'F';
+    canvas[2][15] = 'I';
+    canvas[2][16] = 'M';
+    canvas[2][17] = ' ';
+    canvas[2][18] = 'D';
+    canvas[2][19] = 'E';
+    canvas[2][20] = ' ';
+    canvas[2][21] = 'J';
+    canvas[2][22] = 'O';
+    canvas[2][23] = 'G';
+    canvas[2][24] = 'O';
+    
+    canvas[3][16] = 'S';
+    canvas[3][17] = 'C';
+    canvas[3][18] = 'O';
+    canvas[3][19] = 'R';
+    canvas[3][20] = 'E';
+    canvas[3][21] = ':';
+    canvas[3][22] = ' ';
+    
+    canvas[3][23] = 48 + (int)(score /10);
+    canvas[3][24] = 48 + score - 10 * (int)(score /10);
+    
+    printCanvas();
+}
+
 int main() {
     
-    int gameOver = 0;
+    int gameOver = 0, counter = 0, score;
     while (gameOver == 0) {
         
         // reset da tela
         system("clear");
         cleanCanvas();
         
-        // coloca os objetos e mostra a tela
+        // coloca os objetos na tela
         putObj(dino, dinoLen, dinoPos);
         putObj(cacto, cactoLen, cactoPos);
+        
+        // mostra o canvas e o score do jogador
+        printf("Score: %d\n", score);
         printCanvas();
         
         // verifica colisões
@@ -138,8 +176,11 @@ int main() {
         input();
         upadteXY();
         
-        //usleep(200000);
+        // score = 1/3 do contador de clock
+        counter ++;
+        score = (int)(counter / 3);
     }
     
+    endGame(score);
     return 0;
 }
