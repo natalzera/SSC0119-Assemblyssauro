@@ -102,7 +102,7 @@ ARCHITECTURE main of cpu is
 	CONSTANT sULA		: STD_LOGIC_VECTOR (2 downto 0) := "000";
 	CONSTANT sMem		: STD_LOGIC_VECTOR (2 downto 0) := "001";
 	CONSTANT sM4		: STD_LOGIC_VECTOR (2 downto 0) := "010";
-	CONSTANT sTECLADO	: STD_LOGIC_VECTOR (2 downto 0) := "011"; -- nao tinha
+	CONSTANT sTECLADO	: STD_LOGIC_VECTOR (2 downto 0) := "011"; 	-- nao tinha
 	CONSTANT sSP		: STD_LOGIC_VECTOR (2 downto 0) := "100";	
 
 	
@@ -144,9 +144,9 @@ process(clk, reset)
 	variable selM2 		: STD_LOGIC_VECTOR(2 downto 0); 
 	variable selM6 		: STD_LOGIC_VECTOR(2 downto 0); 
 	
-	VARIABLE BreakFlag	: STD_LOGIC;  -- Para sinalizar a mudanca para Clock manual/Clock Automatico para  a nova instrucao Break
+	VARIABLE BreakFlag	: STD_LOGIC;  	-- Para sinalizar a mudanca para Clock manual/Clock Automatico para  a nova instrucao Break
 	
-	variable state 		: STATES;  -- Estados do processador: fetch, decode, exec, halted
+	variable state 		: STATES;  	-- Estados do processador: fetch, decode, exec, halted
 	
 	-- Seletores dos registradores para execussao das instrucoes
 	variable RX : integer;   
@@ -155,9 +155,8 @@ process(clk, reset)
 
 begin
 	if(reset = '1') then
-	
-		state := fetch;		-- inicializa o estado na busca!
-		M1(15 downto 0) <=	x"0000";  -- inicializa na linha Zero da memoria -> Programa tem que comecar na linha Zero !!
+		state := fetch;			-- inicializa o estado na busca!
+		M1(15 downto 0) <= x"0000";  	-- inicializa na linha Zero da memoria -> Programa tem que comecar na linha Zero !!
 		videoflag <= '0';
 		
 		RX := 0;
@@ -169,11 +168,11 @@ begin
 		LoadIR	:= '0';
 		LoadMAR	:= '0';
 		LoadPC	:= '0';
-		IncPC		:= '0';
-		IncSP		:= '0';
-		DecSP		:= '0';
-		selM2		:= sMem;
-		selM6		:= sULA;
+		IncPC	:= '0';
+		IncSP	:= '0';
+		DecSP	:= '0';
+		selM2	:= sMem;
+		selM6	:= sULA;
 		
 		LoadReg(0) := '0';
 		LoadReg(1) := '0';
@@ -198,30 +197,24 @@ begin
 		IR := x"0000";
 		MAR := x"0000";
 			
-		 BreakFlag:= '0';	-- Break Point Flag
-		 BREAK <= '0'; 	-- Break Point output to switch to manual clock	
+		BreakFlag:= '0';	-- Break Point Flag
+		BREAK <= '0'; 		-- Break Point output to switch to manual clock	
 
-		 -- Novo na Versao 3
+		-- Novo na Versao 3
 		HALT_ack <= '0';
 			
 	elsif(clk'event and clk = '1') then
 	
-		if(LoadIR = '1')	then IR := Mem; 				end if;
-	
-		if(LoadPC = '1')	then PC := Mem; 				end if;
-	
-		if(IncPC = '1')	then PC := PC + x"0001"; 	end if;
-	
-		if(LoadMAR = '1') then MAR := Mem; 				end if;
-	
-		if(LoadSP = '1') 	then SP := M3; 				end if;
-	
-		if(IncSP = '1')	then SP := SP + x"0001"; 	end if;
-	
-		if(DecSP = '1')	then SP := SP - x"0001"; 	end if;
+		if(LoadIR = '1')  then IR := Mem; end if;
+		if(LoadPC = '1')  then PC := Mem; end if;
+		if(IncPC = '1')   then PC := PC + x"0001"; end if;
+		if(LoadMAR = '1') then MAR := Mem; end if;
+		if(LoadSP = '1')  then SP := M3; end if;
+		if(IncSP = '1')   then SP := SP + x"0001"; end if;
+		if(DecSP = '1')	  then SP := SP - x"0001"; end if;
 	
 		-- Selecao do Mux6
-		if (selM6 = sULA) THEN FR <= auxFR;				-- Sempre recebe flags da ULA
+		if (selM6 = sULA) THEN FR <= auxFR;		-- Sempre recebe flags da ULA
 		ELSIF (selM6 = sMem) THEN FR <= Mem; END IF;	-- A menos que seja POP FR, quando recebe da Memoria
 		
 		-- Atualiza o nome dos registradores!!!
@@ -230,11 +223,11 @@ begin
 		RZ := conv_integer(IR(3 downto 1));
 	
 		-- Selecao do Mux2
-		if (selM2 = sULA) 		THEN M2 := RESULT;
+		if    (selM2 = sULA) 	THEN M2 := RESULT;
 		ELSIF (selM2 = sMem) 	THEN M2 := Mem;
-		ELSIF (selM2 = sM4) 		THEN M2 := M4;
+		ELSIF (selM2 = sM4)	THEN M2 := M4;
 		ELSIF (selM2 = sTECLADO)THEN M2 := TECLADO;
-		ELSIF (selM2 = sSP) 		THEN M2 := SP; 
+		ELSIF (selM2 = sSP) 	THEN M2 := SP; 
 		END IF;			
 		
 		-- Carrega dados do Mux 2 para os registradores
@@ -249,7 +242,7 @@ begin
 		IncSP   := '0';
 		DecSP   := '0';
 		LoadSP  := '0';
-		selM6	  := sULA;	-- Sempre atualiza o FR da ULA, a nao ser que a instrucao seja POP FR
+		selM6   := sULA; 	-- Sempre atualiza o FR da ULA, a nao ser que a instrucao seja POP FR
 
 		LoadReg(0) := '0';
 		LoadReg(1) := '0';
@@ -262,7 +255,7 @@ begin
 
 		videoflag <= '0';	-- Abaixa o sinal para a "Placa de Video" : sobe a cada OUTCHAR
 
-		RW <= '0';  -- Sinal de Letura/Ecrita da mem�ria em Leitura  (0 - ler, 1 - escrever)
+		RW <= '0'; -- Sinal de Letura/Ecrita da mem�ria em Leitura  (0 - ler, 1 - escrever)
 
 		-- Novo na Versao 3
 		if(halt_req = '1') then state := halted; end if;
@@ -273,20 +266,17 @@ begin
 		case state is
 --************************************************************************
 -- FETCH STATE
---************************************************************************		
-		
+--************************************************************************
 		when fetch =>
 			PONTO <= "001";
-			
-			-- Inicio das acoes do ciclo de Busca !!       
+
+			-- Inicio das acoes do ciclo de Busca !!
 			M1 <= PC;
 			RW <= '0';
 			LoadIR := '1';
 			IncPC := '1';
 
 			STATE := decode;
-			
--- XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX        			
 
 --************************************************************************
 -- DECODE STATE
@@ -299,7 +289,7 @@ begin
 --========================================================================		
 			IF(IR(15 DOWNTO 10) = INCHAR) THEN -- Se nenhuma tecla for pressionada no momento da leitura, Rx <- x"00FF"
 				
-				TECLADO(7 downto 0) := key(7 downto 0);
+				TECLADO(7 downto 0)  := key(7 downto 0);
 				TECLADO(15 downto 8) := X"00";
 
 				selM2 := sTECLADO;
@@ -311,8 +301,8 @@ begin
 -- OUTCHAR			Video[RY] <- Char(RX)
 --========================================================================
 			IF(IR(15 DOWNTO 10) = OUTCHAR) THEN
-				M3 := Reg(Rx); 							-- M3 <- Rx
-				M4 := Reg(Ry); 							-- M4 <- Ry
+				M3 := Reg(Rx); 			-- M3 <- Rx
+				M4 := Reg(Ry); 			-- M4 <- Ry
 
 				-- Este bloco troca a cor do preto pelo branco: agora a cor "0000" = Branco !
 				if( M3(11 downto 8) = "0000" ) then
@@ -321,18 +311,17 @@ begin
 					M3(11 downto 8) := "0000";
 				end if;
 
-				vga_char <= M3; --vga_char	<= M3  : C�digo do Character vem do Rx via M3
-				vga_pos	<= M4;  --  Posicao na tela do Character vem do Ry via M4
+				vga_char <= M3;    -- vga_char <= M3  : C�digo do Character vem do Rx via M3
+				vga_pos	<= M4;     -- Posicao na tela do Character vem do Ry via M4
 				videoflag <= '1';  -- Sobe o videoflag para gravar o charactere na mem�ria de video
 				state := fetch;		
 			END IF;					
 		
 --========================================================================
 -- MOV  			RX/SP <- RY/SP
-
--- MOV RX RY    RX <- RY	  		Format: < inst(6) | RX(3) | RY(3) | xx | x0 >
--- MOV RX SP    RX <- SP         Format: < inst(6) | RX(3) | xxx | xx | 01 >
--- MOV SP RX    SP <- RX         Format: < inst(6) | RX(3) | xxx | xx | 11 >
+-- MOV RX RY    RX <- RY	Format: < inst(6) | RX(3) | RY(3) | xx | x0 >
+-- MOV RX SP    RX <- SP        Format: < inst(6) | RX(3) | xxx | xx | 01 >
+-- MOV SP RX    SP <- RX        Format: < inst(6) | RX(3) | xxx | xx | 11 >
 
 --========================================================================		
 			IF(IR(15 DOWNTO 10) = MOV) THEN 
@@ -343,8 +332,11 @@ begin
 --========================================================================
 -- STORE   DIReto			M[END] <- RX
 --========================================================================			
-			IF(IR(15 DOWNTO 10) = STORE) THEN  -- Busca o endereco
-				
+			IF(IR(15 DOWNTO 10) = STORE) THEN  -- Busca o endereco e coloca o valor no MAR
+				M1 <= PC;
+				Rw <= '0';
+				LoadMAR := '1';
+				IncPC := '1';
 				state := exec;  -- Vai para o estado de Executa para gravar Registrador no endereco
 			END IF;					
 		
@@ -359,8 +351,11 @@ begin
 --========================================================================
 -- LOAD Direto  			RX <- M[End]
 --========================================================================		
-			IF(IR(15 DOWNTO 10) = LOAD) THEN -- Busca o endereco
-				
+			IF(IR(15 DOWNTO 10) = LOAD) THEN -- Busca o endereco na memória e coloca o valor no MAR
+				M1 <= PC;
+				Rw <= '0';
+				LoadMAR := '1';
+				IncPC := '1';	
 				state := exec;  -- Vai para o estado de Executa para buscar o dado do endereco
 			END IF;			
 			
@@ -368,11 +363,11 @@ begin
 -- LOAD Imediato 			RX <- Nr
 --========================================================================			
 			IF(IR(15 DOWNTO 10) = LOADIMED) THEN
-				M1 <= PC;				-- M1 <- PC
-				Rw <= '0';				-- Rw <= '0'
-				selM2 := sMeM; 		-- M2 <- MEM	
-				LoadReg(RX) := '1';	-- LRx <- 1	
-				IncPC := '1';  		-- IncPC <- 1	
+				M1 <= PC;		-- M1 <- PC
+				Rw <= '0';		-- Rw <= '0'
+				selM2 := sMeM; 		-- M2 <- MEM
+				LoadReg(RX) := '1';	-- LRx <- 1
+				IncPC := '1';  		-- IncPC <- 1
 				state := fetch;
 			END IF;					
 			
@@ -510,42 +505,34 @@ begin
 				BREAK <= BreakFlag;
 				state := fetch;	
 				PONTO <= "101";
-			END IF;		
-							
--- XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX			
-			
-			
-			
-			
-		
-			
-					
-							
-		
-								
-							
-								
+			END IF;
+
 
 --************************************************************************
 -- EXECUTE STATE
---************************************************************************								
-					
+--************************************************************************
 			when exec =>
 				PONTO <= "100";
 				
 --========================================================================
 -- EXEC STORE DIReto 			M[END] <- RX
 --========================================================================
-			IF(IR(15 DOWNTO 10) = STORE) THEN 
-				
+			IF(IR(15 DOWNTO 10) = STORE) THEN  -- escreve o dado mandado pro MAR na memória
+				M1 <= MAR;
+				RW <= '1';
+				selM3 := RX; 		-- M3 <- RX
+				selM5 := sMeM; 		-- M2 <- MEM
 				state := fetch;
 			END IF;
 						
 --========================================================================
 -- EXEC LOAD DIReto  			RX <- M[END]
 --========================================================================
-			IF(IR(15 DOWNTO 10) = LOAD) THEN
-				
+			IF(IR(15 DOWNTO 10) = LOAD) THEN -- lê o o dado mandado pro MAR e armazena em RX
+				M1 <= MAR;
+				RW <= '0';
+				selM2 := sMeM; 		-- M2 <- MEM
+				LoadReg(RX) := '1';	-- LRx <- 1
 				state := fetch;
 			END IF;
 			
@@ -571,13 +558,9 @@ begin
 			IF(IR(15 DOWNTO 10) = POP) THEN
 				
 				state := fetch;
-			END IF;		
-				
--- XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-				
-				
-				
-				
+			END IF;
+
+
 --************************************************************************
 -- HALT STATE
 --************************************************************************				
@@ -592,11 +575,8 @@ begin
 			PONTO <= "000";
 		
 		END CASE;	
-		
 	end if;	
 	end process;
-
-	
 	
 	
 --************************************************************************
