@@ -35,7 +35,7 @@ end cpu;
 -- arquitetura interna do processador --
 ARCHITECTURE main of cpu is
 
-	TYPE STATES		is (fetch, decode, exec, halted);			-- Estados da Maquina de Controle do Processador
+	TYPE STATES		is (fetch, decode, exec, exec2, halted);		-- Estados da Maquina de Controle do Processador
 	TYPE Registers		is array(0 to 7) of STD_LOGIC_VECTOR(15 downto 0); 	-- Banco de Registradores
 	TYPE LoadRegisters	is array(0 to 7) of std_LOGIC;				-- Sinais de LOAD dos Registradores do Banco
 
@@ -129,14 +129,16 @@ process(clk, reset)
 	-- Mux dos barramentos de dados internos	
 	VARIABLE M2		:STD_LOGIC_VECTOR(15 downto 0);	-- Mux dos barramentos de dados internos para os Registradores
 	VARIABLE M3, M4		:STD_LOGIC_VECTOR(15 downto 0);	-- Mux dos Registradores para as entradas da ULA
+	VARIABLE M6             :STD_LOGIC_VECTOR(15 downto 0);
 	
 	-- Novos Sinais da Versao 2: Controle dos registradores internos (Load-Inc-Dec)
 	variable LoadReg	: LoadRegisters; 
 	variable LoadIR		: std_LOGIC;
 	variable LoadMAR	: std_LOGIC;
 	variable LoadPC		: std_LOGIC;
+	variable LoadFR		: std_LOGIC;
 	variable IncPC 		: std_LOGIC;
-	VARIABLE LoadSP		: STD_LOGIC;
+	variable LoadSP		: std_LOGIC;
 	variable IncSP 		: std_LOGIC;
 	variable DecSP		: std_LOGIC;
 	
@@ -168,6 +170,8 @@ begin
 		LoadIR	:= '0';
 		LoadMAR	:= '0';
 		LoadPC	:= '0';
+		LoadFR	:= '0';
+		LoadSP	:= '0';
 		IncPC	:= '0';
 		IncSP	:= '0';
 		DecSP	:= '0';
@@ -205,17 +209,19 @@ begin
 			
 	elsif(clk'event and clk = '1') then
 	
-		if(LoadIR = '1')  then IR := Mem; end if;
-		if(LoadPC = '1')  then PC := Mem; end if;
-		if(IncPC = '1')   then PC := PC + x"0001"; end if;
+		if(LoadIR = '1')  then IR  := Mem; end if;
+		if(LoadPC = '1')  then PC  := Mem; end if;
+		if(IncPC = '1')   then PC  := PC + x"0001"; end if;
 		if(LoadMAR = '1') then MAR := Mem; end if;
-		if(LoadSP = '1')  then SP := M3; end if;
-		if(IncSP = '1')   then SP := SP + x"0001"; end if;
-		if(DecSP = '1')	  then SP := SP - x"0001"; end if;
+		if(LoadSP = '1')  then SP  := M4; end if;
+		if(IncSP = '1')   then SP  := SP + x"0001"; end if;
+		if(DecSP = '1')	  then SP  := SP - x"0001"; end if;
 	
 		-- Selecao do Mux6
-		if (selM6 = sULA) THEN FR <= auxFR;		-- Sempre recebe flags da ULA
-		ELSIF (selM6 = sMem) THEN FR <= Mem; END IF;	-- A menos que seja POP FR, quando recebe da Memoria
+		if (selM6 = sULA) THEN M6 := auxFR;		-- Sempre recebe flags da ULA
+		ELSIF (selM6 = sMem) THEN M6 := Mem; END IF;	-- A menos que seja POP FR, quando recebe da Memoria
+
+		if(LoadFR = '1') THEN FR <= M6; end if;
 		
 		-- Atualiza o nome dos registradores!!!
 		RX := conv_integer(IR(9 downto 7));
@@ -242,6 +248,7 @@ begin
 		IncSP   := '0';
 		DecSP   := '0';
 		LoadSP  := '0';
+		LoadFR  := '0';
 		selM6   := sULA; 	-- Sempre atualiza o FR da ULA, a nao ser que a instrucao seja POP FR
 
 		LoadReg(0) := '0';
@@ -376,7 +383,8 @@ begin
 				M1 <= PC;       -- carrega no MAR o endereço da memória selecionado
 				Rw <= '0';
 				LoadMAR := '1';
-	
+	                        IncPC := '1';
+
 				state := exec;  -- Vai para o estado de Executa para buscar o dado do endereco
 			END IF;			
 			
@@ -499,7 +507,7 @@ begin
 
                 -- se não passou na condição, apenas incrementa o PC
                 ELSE
-                    IncPC := '1'
+                    IncPC := '1';
                 END IF;
 
                 state := fetch;
@@ -575,6 +583,7 @@ begin
 -- RTS 			PC <- Mem[SP]
 --========================================================================				
 			IF(IR(15 DOWNTO 10) = RTS) THEN
+				IncPC := '1';
 				state := exec;
 			END IF;
 
@@ -693,7 +702,6 @@ begin
 				selM2 := sMeM; 		-- M2 <- MEM
 				LoadReg(RX) := '1';	-- LRx <- 1
 
-                IncPC := '1';
 				state := fetch;
 			END IF;
 			
@@ -716,8 +724,7 @@ begin
 				Rw <= '0';
 				LoadPc := '1';  -- armazena o valor lido no PC
 
-                IncPC := '1';
-				state := fetch;
+				state := exec2;
 			END IF;
 			
 --========================================================================
@@ -741,6 +748,16 @@ begin
 				state := fetch;
 			END IF;
 
+--************************************************************************
+-- EXEC2 STATE (apenas para o RTS incrementar o PC)
+--************************************************************************
+		WHEN exec2 =>
+			PONTO <= "101";
+		
+		IF(IR(15 DOWNTO 10) = RTS) THEN
+			IncPC := '1';
+			state := fetch;
+		END IF;
 
 --************************************************************************
 -- HALT STATE
