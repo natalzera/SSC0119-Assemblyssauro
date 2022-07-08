@@ -8,7 +8,7 @@ use ieee.std_LOGIC_unsigned.all;
 
 -- dados de entrada e saída do processador --
 entity cpu is
-	port(	clk		: in	std_LOGIC;
+	port( clk		: in	std_LOGIC;
 		reset		: in	std_LOGIC;
 
 		Mem		: in	STD_LOGIC_VECTOR(15 downto 0);
@@ -231,7 +231,7 @@ begin
 		-- Selecao do Mux2
 		if    (selM2 = sULA) 	THEN M2 := RESULT;
 		ELSIF (selM2 = sMem) 	THEN M2 := Mem;
-		ELSIF (selM2 = sM4)	THEN M2 := M4;
+		ELSIF (selM2 = sM4)	    THEN M2 := M4;
 		ELSIF (selM2 = sTECLADO)THEN M2 := TECLADO;
 		ELSIF (selM2 = sSP) 	THEN M2 := SP; 
 		END IF;			
@@ -517,11 +517,11 @@ begin
 -- PUSH RX
 --========================================================================		
 			IF(IR(15 DOWNTO 10) = PUSH) THEN
-                RW <= '1';      -- seleciona o endereço de escrita da memória indicado pelo SP
                 M1 <= SP;
+                RW <= '1';      -- seleciona o endereço de escrita da memória indicado pelo SP
 
                 -- se vai guardar na memória o valor de RX
-                IF(IR(6)='0')THEN
+                IF(IR(6) = '0')THEN
                     M3 := Reg(RX);
 
                 -- se vai guardar na memória o valor de FR
@@ -731,8 +731,8 @@ begin
 -- EXEC POP RX/FR
 --========================================================================
 			IF(IR(15 DOWNTO 10) = POP) THEN
-                RW <= '0';      -- busca na memória o endereço guardado pelo SP
                 M1 <= SP;
+                RW <= '0';      -- busca na memória o endereço guardado pelo SP
 
                 -- se vai guardar o valor buscado no RX
                 IF(IR(6) = '0') THEN
