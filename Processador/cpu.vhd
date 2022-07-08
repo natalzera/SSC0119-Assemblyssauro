@@ -193,7 +193,7 @@ begin
 		REG(7)  := x"0000";
 		
 		PC := x"0000";  -- inicializa na linha Zero da memoria -> Programa tem que comecar na linha Zero !!
-		SP := x"7f00";  -- Inicializa a Pilha no final da mem�ria: 7ffc
+		SP := x"7f00";  -- Inicializa a Pilha no final da memória: 7ffc
 		IR := x"0000";
 		MAR := x"0000";
 			
@@ -255,7 +255,7 @@ begin
 
 		videoflag <= '0';	-- Abaixa o sinal para a "Placa de Video" : sobe a cada OUTCHAR
 
-		RW <= '0'; -- Sinal de Letura/Ecrita da mem�ria em Leitura  (0 - ler, 1 - escrever)
+		RW <= '0'; -- Sinal de Letura/Ecrita da memória em Leitura  (0 - ler, 1 - escrever)
 
 		-- Novo na Versao 3
 		if(halt_req = '1') then state := halted; end if;
@@ -270,7 +270,7 @@ begin
 		when fetch =>
 			PONTO <= "001";
 
-			-- Inicio das acoes do ciclo de Busca !!
+			-- Inicio das ações do ciclo de Busca !!
 			M1 <= PC;
 			RW <= '0';
 			LoadIR := '1';
@@ -311,9 +311,9 @@ begin
 					M3(11 downto 8) := "0000";
 				end if;
 
-				vga_char <= M3;    -- vga_char <= M3  : C�digo do Character vem do Rx via M3
+				vga_char <= M3;    -- vga_char <= M3  : Código do Character vem do Rx via M3
 				vga_pos	<= M4;     -- Posicao na tela do Character vem do Ry via M4
-				videoflag <= '1';  -- Sobe o videoflag para gravar o charactere na mem�ria de video
+				videoflag <= '1';  -- Sobe o videoflag para gravar o charactere na memória de video
 				state := fetch;
 			END IF;
 		
@@ -348,8 +348,8 @@ begin
 --========================================================================
 -- STORE   DIReto			M[END] <- RX
 --========================================================================			
-			IF(IR(15 DOWNTO 10) = STORE) THEN  -- Busca o endereco e coloca o valor no MAR
-				M1 <= PC;
+			IF(IR(15 DOWNTO 10) = STORE) THEN
+				M1 <= PC;       -- coloca o endereço da memória selecionado no MAR
 				Rw <= '0';
 				LoadMAR := '1';
 
@@ -410,15 +410,42 @@ begin
 -- LOGIC OPERATION ('SHIFT', and 'CMP'  NOT INCLUDED)  			RX <- RY (?) RZ
 --========================================================================		
 			IF(IR(15 DOWNTO 14) = LOGIC AND IR(13 DOWNTO 10) /= SHIFT AND IR(13 DOWNTO 10) /= CMP) THEN 
-				
+				M3 := Reg(RY);      -- coloca os valores de RY e RZ na ULA
+                M4 := Reg(RZ);
+
+                X <= M3;
+                Y <= M4;
+
+                -- lê a operação de ULA passada
+                OP( 5 downto 0) <= IR(15 DOWNTO 10);
+                OP(6) <= '0';
+
+                selM2 := sULA;      -- guarda em RX o resultado da operação
+                LoadReg(RX) := '1';
+
+                selM6 := sULA;      -- guarda o resultado também no FR
+                LoadFR := '1';
+
 				state := fetch;
-			END IF;			
+			END IF;
 		
 --========================================================================
 -- CMP		RX, RY
 --========================================================================		
 			IF(IR(15 DOWNTO 14) = LOGIC AND IR(13 DOWNTO 10) = CMP) THEN 
-				
+				M3 := Reg(RX);      -- coloca os valores de RX e RY na ULA para compará-los
+                M4 := Reg(RY);
+
+                X <= M3;
+                Y <= M4;
+
+                -- seleciona a operação de comparação na ULA
+                OP(5 downto 4) <= LOGIC;
+                OP(3 downto 0) <= CMP;
+
+                selM6 := sULA;      -- guarda o valor da comparação no FR
+                LoadFR := '1';
+
 				state := fetch;
 			END IF;
 		
@@ -449,15 +476,54 @@ begin
 -- JMP Condition: (UNconditional, EQual, Not Equal, Zero, Not Zero, CarRY, Not CarRY, GReater, LEsser, Equal or Greater, Equal or Lesser, OVerflow, Not OVerflow, Negative, DIVbyZero, NOT USED)	
 --========================================================================		
 			IF(IR(15 DOWNTO 10) = JMP) THEN 
-				
-				state := fetch;
+				-- tipo do jump e condição necessária
+				IF((IR(9 downto 6) = "0000") or                                     -- sem condição
+                   (IR(9 downto 6) = "0001" and FR(2) = '1') or 			        -- igual
+                   (IR(9 downto 6) = "0010" and FR(2) = '0') or 			        -- diferente
+                   (IR(9 downto 6) = "0011" and FR(3) = '1') or 			        -- zero
+                   (IR(9 downto 6) = "0100" and FR(3) = '0') or 			        -- diferente de zero
+                   (IR(9 downto 6) = "0101" and FR(4) = '1') or 			        -- carry
+                   (IR(9 downto 6) = "0110" and FR(4) = '0') or 			        -- sem carry
+                   (IR(9 downto 6) = "0111" and FR(0) = '1') or                     -- maior
+                   (IR(9 downto 6) = "1000" and FR(1) = '1') or			            -- menor
+                   (IR(9 downto 6) = "1001" and (FR(2) = '1' or FR(0) = '1')) or    -- maior ou igual
+                   (IR(9 downto 6) = "1010" and (FR(2) = '1' or FR(1) = '1')) or 	-- menor ou igual
+                   (IR(9 downto 6) = "1011" and FR(5) = '1') or 			        -- overflow na ULA
+                   (IR(9 downto 6) = "1100" and FR(5) = '0') or 			        -- sem overflow na ULA
+                   (IR(9 downto 6) = "1101" and FR(9) = '1') or 		            -- resultado negativo na ULA
+                   (IR(9 downto 6) = "1110" and FR(6) = '1')) then 			        -- divisão por zero
+                        -- se passou na condição, prepara para a leitura do novo valor do PC (vindo da memória)
+                        M1 <= PC;
+                        RW <= '0';
+                        LoadPC := '1';
+
+                -- se não passou na condição, apenas incrementa o PC
+                ELSE
+                    IncPC := '1'
+                END IF;
+
+                state := fetch;
 			END IF;
 
 --========================================================================
 -- PUSH RX
 --========================================================================		
 			IF(IR(15 DOWNTO 10) = PUSH) THEN
-				
+                RW <= '1';      -- seleciona o endereço de escrita da memória indicado pelo SP
+                M1 <= SP;
+
+                -- se vai guardar na memória o valor de RX
+                IF(IR(6)='0')THEN
+                    M3 := Reg(RX);
+
+                -- se vai guardar na memória o valor de FR
+                ELSIF(IR(6) = '1') THEN
+                    M3:= FR;
+                END IF;
+
+                M5 <= M3;       -- manda o valor selecionado para a memória endereçada
+                DecSP := '1';
+
 				state := fetch;
 			END IF;
 		
@@ -465,7 +531,7 @@ begin
 -- POP RX
 --========================================================================
 			IF(IR(15 DOWNTO 10) = POP) THEN
-				
+				IncSP := '1';
 				state := exec;
 			END IF;	
 				
@@ -516,7 +582,22 @@ begin
 -- ARITH OPERATION ('INC' NOT INCLUDED) 			RX <- RY (?) RZ
 --========================================================================
 			IF(IR(15 DOWNTO 14) = ARITH AND IR(13 DOWNTO 10) /= INC) THEN
-				
+                M3 := Reg(RY);      -- coloca os valores de RY e RZ na ULA
+                M4 := Reg(RZ);
+
+                X <= M3;
+                Y <= M4;
+
+                -- seleciona a operação da instrução na ULA
+                OP(5 downto 0) <= IR(15 DOWNTO 10);
+                OP(6) <= IR(0);
+
+                selM2 := sULA;      -- guarda em RX o resultado da operação
+                LoadReg(RX) := '1';
+
+                selM6 := sULA;      -- também guarda o resultado para FR
+                LoadFR := '1';
+
 				state := fetch;
 			END IF;
 			
@@ -524,7 +605,30 @@ begin
 -- INC/DEC			RX <- RX (+ or -) 1
 --========================================================================			
 			IF(IR(15 DOWNTO 14) = ARITH AND (IR(13 DOWNTO 10) = INC))	THEN
-				
+				M3 := Reg(RX);      -- manda para a ULA os valores de RX e 1
+                M4 := "0000000000000001";
+
+                X <= M3;
+                Y <= M4;
+
+                OP(5 downto 4) <= ARITH;
+
+                -- se é incremento
+                IF(IR(6) = '0') THEN
+                    OP(3 downto 0) <= ADD;
+
+                -- se é decremento
+                ELSE
+                    OP(3 downto 0) <= SUB;
+                END IF;
+                OP(6) <= '0';
+
+                selM2 := sUlA;      -- guarda o resultado da operação de volta para RX
+                LoadReg(Rx) := '1';
+
+                selM6 := sULA;      -- também guarda o resultado em FR
+                LoadFR := '1';
+
 				state := fetch;
 			END IF;
 			
@@ -620,7 +724,20 @@ begin
 -- EXEC POP RX/FR
 --========================================================================
 			IF(IR(15 DOWNTO 10) = POP) THEN
-				
+                RW <= '0';      -- busca na memória o endereço guardado pelo SP
+                M1 <= SP;
+
+                -- se vai guardar o valor buscado no RX
+                IF(IR(6) = '0') THEN
+                    selM2 := sMeM;
+                    LoadReg(RX) := '1';
+                
+                -- se vai guardar o valor buscado no FR
+                ELSIF(IR(6) ='1') THEN
+                    selM6 := sMeM;
+                    Loadfr := '1';
+                END IF;
+
 				state := fetch;
 			END IF;
 
@@ -753,6 +870,5 @@ BEGIN
 		END IF;
 	END IF; -- Reset
 END PROCESS;
-
 
 end main;
