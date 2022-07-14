@@ -47,7 +47,9 @@ ARCHITECTURE main of cpu is
 	CONSTANT MOV		: STD_LOGIC_VECTOR(5 downto 0) := "110011";		-- MOV RX RY    -- RX <- RY	  	Format: < inst(6) | RX(3) | RY(3) | xx | x0 >
 											-- MOV RX SP    -- RX <- SP         	Format: < inst(6) | RX(3) | xxx | xx | 01 >
 											-- MOV SP RX    -- SP <- RX         	Format: < inst(6) | RX(3) | xxx | xx | 11 >
-	
+	-- nova instrução!!!
+	CONSTANT MOVSTORE	: STD_LOGIC_VECTOR(5 downto 0) := "110111";		-- MOVST RX RY -- RX <- M[RX] <- RY	Format: < inst(6) | RX(3) | RY(3) | xx | xx >	
+
 	-- I/O Instructions:
 	CONSTANT OUTCHAR	: STD_LOGIC_VECTOR(5 downto 0) := "110010";		-- OUTCHAR RX RY -- Video[RY] <- Char(RX)	Format: < inst(6) | RX(3) | RY(3) | xxxx >
 											-- RX contem o codigo do caracter de 0 a 127, sendo que 96 iniciais estao prontos com a tabela ASCII
@@ -332,7 +334,7 @@ begin
 --========================================================================
 -- MOV  			RX/SP <- RY/SP
 
--- MOV RX RY    RX <- RY	  		Format: < inst(6) | RX(3) | RY(3) | xx | x0 >
+-- MOV RX RY    RX <- RY	 Format: < inst(6) | RX(3) | RY(3) | xx | x0 >
 -- MOV RX SP    RX <- SP         Format: < inst(6) | RX(3) | xxx | xx | 01 >
 -- MOV SP RX    SP <- RX         Format: < inst(6) | RX(3) | xxx | xx | 11 >
 
@@ -356,7 +358,24 @@ begin
 					loadReg(Rx) := '1';
 				END IF;
 				state := fetch;
-			END IF;				
+			END IF;
+
+--========================================================================
+-- MOV STORE 			RX <- M[RX] <- RY
+--========================================================================
+			IF(IR(15 DOWNTO 10) = MOVSTORE) THEN
+				M4 := Reg(Rx);	-- pega o endereço da memória guardado no RX
+				M1 <= M4;
+				Rw <= '1';
+				M3 := Reg(Ry);	-- manda para M5 escrever na memória o valor de RY
+				M5 <= M3;
+
+				M4 := Reg(Ry);  -- Manda o valor de RY para RX
+				selM2 := sM4;
+				loadReg(Rx) := '1';
+
+				state := fetch;
+			END IF;
 				
 --========================================================================
 -- LOAD Imediato 			RX <- Nr
@@ -681,7 +700,7 @@ begin
 					
 			when exec =>
 				PONTO <= "100";
-				
+
 --========================================================================
 -- EXEC STORE DIReto 			M[END] <- RX
 --========================================================================
