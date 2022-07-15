@@ -148,10 +148,20 @@ CallSai:
 	outchar r2, r0		; Printa P na linha 30
 	
 	
+	; Teste do MOVST (nova instrução)
+	loadn r0, #32
+	loadn r1, #'Q'
+	loadn r2, #Ender
+	movst r2, r1	
+	outchar r2, r0		; Printa Q na linha 32
 	
+	load r2, Ender
+	loadn r0, #34
+	outchar r2, r0		; Printa Q na linha 34
 Fim:	
 	halt
 
-	
+
+Ender: var #1	
 Dado : var #1  ; O comando VAR aloca bytes de memoria e associa o primeiro byte ao LABEL
 static Dado + #0, #'B'
