@@ -370,11 +370,7 @@ begin
 				M3 := Reg(Ry);	-- manda para M5 escrever na memória o valor de RY
 				M5 <= M3;
 
-				M4 := Reg(Ry);  -- Manda o valor de RY para RX
-				selM2 := sM4;
-				loadReg(Rx) := '1';
-
-				state := fetch;
+				state := exec;
 			END IF;
 				
 --========================================================================
@@ -700,6 +696,16 @@ begin
 					
 			when exec =>
 				PONTO <= "100";
+
+--========================================================================
+-- EXEC MOV STORE 		RX <- RY
+--========================================================================
+			IF(IR(15 DOWNTO 10) = MOVSTORE) THEN
+				M4 := Reg(Ry);  -- Manda o valor de RY para RX
+				selM2 := sM4;
+				loadReg(Rx) := '1';
+				state := fetch;
+			END IF;
 
 --========================================================================
 -- EXEC STORE DIReto 			M[END] <- RX
