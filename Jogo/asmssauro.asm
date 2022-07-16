@@ -4282,10 +4282,10 @@ printScore:
   rts
 
 simulateDelay:
-  loadn r1, #600 
+  loadn r1, #100
 
   simulateDelayOuterLoop:
-    loadn r2, #600
+    loadn r2, #100
 
     simulateDelayInnerLoop:
       dec r2
@@ -4793,7 +4793,6 @@ resetVariables:
 
   rts
 
-
 ; ---------------------------------------------
 ;                                          MAIN
 ; ---------------------------------------------
@@ -4820,8 +4819,7 @@ main:
   store DinoPosition, r0
   call printDino
   
-  printFrames:
-    call simulateDelay   
+  printFrames: 
     call checkJumpEvent
     call checkCollisionEvent
     
@@ -4831,8 +4829,16 @@ main:
     jeq GameOverMenu
 
     call controlObstacle
+    call checkCollisionEvent
+    
+    load r0, CollisionStatus
+    loadn r1, #1
+    cmp r0, r1
+    jeq GameOverMenu
+    
     call controlScore
-
+    call simulateDelay
+    
     jmp printFrames
 
   GameOverMenu:
@@ -4840,10 +4846,14 @@ main:
     call printRecord
 
     waitForRestartEvent:
-      loadn r0, #' '
-      inchar r1
+      inchar r0
+
+      loadn r1, #127
       cmp r0, r1
-      
+      jeq quitGame
+
+      loadn r1, #' '
+      cmp r0, r1      
       jne waitForRestartEvent
 
     call resetVariables
@@ -4862,4 +4872,5 @@ main:
 
     jmp printFrames
 
-  halt
+  quitGame:
+    halt
