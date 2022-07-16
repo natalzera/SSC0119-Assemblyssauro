@@ -4846,10 +4846,14 @@ main:
     call printRecord
 
     waitForRestartEvent:
-      loadn r0, #' '
-      inchar r1
+      inchar r0
+
+      loadn r1, #127
       cmp r0, r1
-      
+      jeq quitGame
+
+      loadn r1, #' '
+      cmp r0, r1      
       jne waitForRestartEvent
 
     call resetVariables
@@ -4868,4 +4872,5 @@ main:
 
     jmp printFrames
 
-  halt
+  quitGame:
+    halt
