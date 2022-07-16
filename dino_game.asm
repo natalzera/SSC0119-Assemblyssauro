@@ -4282,10 +4282,10 @@ printScore:
   rts
 
 simulateDelay:
-  loadn r1, #50
+  loadn r1, #100
 
   simulateDelayOuterLoop:
-    loadn r2, #50
+    loadn r2, #100
 
     simulateDelayInnerLoop:
       dec r2
