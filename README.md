@@ -135,6 +135,6 @@ Dessa forma, nota-se que a letra Q é mostrada na tela quando ocorre o MOV de RY
 
 Conforme essas condições, foi montado e executado no processador esse código de teste para todas as instruções implementadas e o resultado foi:
 
-![testa cpu rodando no processador]()
+![testa cpu rodando no processador](https://github.com/natalzera/SSC0119-Assemblyssauro/blob/main/imgs/cpu_func.jpg)
 
 ## Jogo
