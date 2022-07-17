@@ -26,6 +26,7 @@ loadn r1, #21   ; carrega r1 com o valor inteiro 21
 movst r0, r1    ; tanto o endereço de memória "End" quanto r0 irão armazenar o valor de r1 (21)
 ```
 
+### No Montador
 Para essa funcionalidade funcionar, primeiramente ela é adicionada no montador para possibilitar a geração de seu código em binário:
 
 No "defs.h"
@@ -82,6 +83,7 @@ else if (strcmp(str_tmp,MOV_STORE_STR) == 0) {
 // ...
 ```
 
+### Na cpu.vhd
 Visto isso, com o montador possibilitando a geração do código binário da nova instrução com seus diferentes parâmetros, modificamos o processador para receber esse código binário, interpretá-lo e executar a instrução:
 
 ```vhd
