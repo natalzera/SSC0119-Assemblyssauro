@@ -79,4 +79,32 @@ case MOV_STORE_CODE:
 else if (strcmp(str_tmp,MOV_STORE_STR) == 0) {
     return MOV_STORE_CODE;
 }
+// ...
+```
+
+Visto isso, com o montador possibilitando a geração do código binário da nova instrução com seus diferentes parâmetros, modificamos o processador para receber esse código binário, interpretá-lo e executar a instrução:
+
+```vhd
+-- opcode da instrução
+CONSTANT MOVSTORE	: STD_LOGIC_VECTOR(5 downto 0) := "110111";
+-- ...
+
+-- no estado de decodificação
+IF(IR(15 DOWNTO 10) = MOVSTORE) THEN
+        M4 := Reg(Rx);	-- pega o endereço da memória guardado no RX
+        M1 <= M4;
+        Rw <= '1';
+        M3 := Reg(Ry);	-- manda para M5 escrever na memória o valor de RY
+        M5 <= M3;
+
+        state := exec;
+END IF;
+
+-- no estado de execução
+IF(IR(15 DOWNTO 10) = MOVSTORE) THEN
+        M4 := Reg(Ry);  -- Manda o valor de RY para RX
+        selM2 := sM4;
+        loadReg(Rx) := '1';
+        state := fetch;
+END IF;
 ```
