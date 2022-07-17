@@ -145,4 +145,4 @@ Portanto, nota-se que o processador elaborado pelo grupo funciona para todas as 
 ## Jogo
 Com o processador pronto, foi elaborado um jogo na linguagem assembly que funcione nele. O jogo consiste em se assemelhar ao do dinossauro do google (que fica disponível quando a conexão é interrompida).
 
-https://github.com/natalzera/SSC0119-Assemblyssauro/blob/main/DinoGameDEMO.mp4
+![asmssauro funcionando no simulador](https://github.com/natalzera/SSC0119-Assemblyssauro/blob/main/imgs/DinoGameDEMO.gif)
