@@ -147,8 +147,16 @@ Com o processador pronto, foi elaborado um jogo na linguagem assembly que funcio
 
 Ao iniciar o jogo, é mostrada uma tela inicial que espera o usuário digitar a tecla de espaço para começa-lo.
 
-(img de inicio)
+![menu de início do jogo](https://github.com/natalzera/SSC0119-Assemblyssauro/blob/main/imgs/menu_inicio.png)
 
-visto isso, 
+Após isso, o jogo funciona desenhando o dinossauro e o cenário com suas respectivas informações (score máximo no canto superior esquerdo e score atual no canto superior direito).
+
+![tela principal do jogo](https://github.com/natalzera/SSC0119-Assemblyssauro/blob/main/imgs/jogando.png)
+
+Além disso, vão se aproximando do dinossauro alguns obstáculos que deverão ser pulados (ou não) apertando a tecla de espaço. Esses obstáculos são gerados pseudo-aleatoriamente de acordo com uma lista pré definida de números no código em assembly do jogo, e os possíveis obstáculos serão:
+
+![obstáculo cacto do jogo](https://github.com/natalzera/SSC0119-Assemblyssauro/blob/main/imgs/cacto.png)
+![obstáculo pterodáctilo no chão do jogo](https://github.com/natalzera/SSC0119-Assemblyssauro/blob/main/imgs/ptero_chao.png)
+![obstáculo pterodáctilo no alto do jogo](https://github.com/natalzera/SSC0119-Assemblyssauro/blob/main/imgs/ptero_alto.png)
 
 ![asmssauro funcionando no simulador](https://github.com/natalzera/SSC0119-Assemblyssauro/blob/main/imgs/DinoGameDEMO.gif)
