@@ -15,7 +15,10 @@ Conforme foi proposta inicialmente, a arquitetura do processador elaborada segue
 Dado isso, em "cpu.vhd" foram implementadas as funcionalidades já propostas em "manual_processador_ICMC.pdf" e a nossa nova funcionalidade criada: a **movst**.
 
 ## Nova funcionalidade
-A **MOVE STORE**, como o próprio nome já diz, é capaz de mover o valor de um registrador RY para outro RX e, ao mesmo tempo, guardar esse valor na memóra (endereçada pelo antigo valor de RX).
+A **MOVE STORE**, como o próprio nome já diz, é capaz de mover o valor de um registrador RY para outro RX e, ao mesmo tempo, guardar esse valor na memóra (endereçada pelo antigo valor de RX). Sua sintaxe no assembly e sua interpretação binária é dada da seguinte forma:
+```
+movst rx, ry        110111|rx|ry|xxxx
+```
 
 A seguir, um exemplo de código em assembly utilizando da nova funcionalidade
 ```asm
@@ -141,3 +144,5 @@ Portanto, nota-se que o processador elaborado pelo grupo funciona para todas as 
 
 ## Jogo
 Com o processador pronto, foi elaborado um jogo na linguagem assembly que funcione nele. O jogo consiste em se assemelhar ao do dinossauro do google (que fica disponível quando a conexão é interrompida).
+
+![asmssauro funcionando no simulador](https://github.com/natalzera/SSC0119-Assemblyssauro/blob/main/DinoGameDEMO.mp4)
