@@ -115,4 +115,26 @@ END IF;
 
 Por fim, é importante notar que o caminho de dados exigido por esta nova instrução não exigiu nenhuma outra modificação na arquitetura do processador.
 
+### No testa_cpu.asm
+Para a testagem da instrução implementada tanto no processador quanto no montador, foi adicionado no código assembly de testagem essa nova instrução, imprimindo a letra Q caso tenha funcionado.
+
+```asm
+; Teste do MOVST (nova instrução)
+loadn r0, #32
+loadn r1, #'Q'
+loadn r2, #Ender
+movst r2, r1	
+outchar r2, r0		; Printa Q na linha 32
+
+load r2, Ender
+loadn r0, #34
+outchar r2, r0		; Printa Q na linha 34
+; ...
+```
+Dessa forma, nota-se que a letra Q é mostrada na tela quando ocorre o MOV de RY para RX e depois quando ocorre o STORE de RY para o endereço guardado em RX, mostrando 2 vezes o Q se a instrução funciona completamente.
+
+Conforme essas condições, foi montado e executado no processador esse código de teste para todas as instruções implementadas e o resultado foi:
+
+![testa cpu rodando no processador]()
+
 ## Jogo
