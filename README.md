@@ -137,4 +137,7 @@ Conforme essas condições, foi montado e executado no processador esse código 
 
 ![testa cpu rodando no processador](https://github.com/natalzera/SSC0119-Assemblyssauro/blob/main/imgs/cpu_func.jpg)
 
+Portanto, nota-se que o processador elaborado pelo grupo funciona para todas as funcionalidades exigidas e a nova implementada!
+
 ## Jogo
+Com o processador pronto, foi elaborado um jogo na linguagem assembly que funcione nele. O jogo consiste em se assemelhar ao do dinossauro do google (que fica disponível quando a conexão é interrompida).
