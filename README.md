@@ -112,3 +112,7 @@ IF(IR(15 DOWNTO 10) = MOVSTORE) THEN
 END IF;
 -- ...
 ```
+
+Por fim, é importante notar que o caminho de dados exigido por esta nova instrução não exigiu nenhuma outra modificação na arquitetura do processador.
+
+## Jogo
