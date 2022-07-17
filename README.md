@@ -159,4 +159,10 @@ Além disso, vão se aproximando do dinossauro alguns obstáculos que deverão s
 ![obstáculo pterodáctilo no chão do jogo](https://github.com/natalzera/SSC0119-Assemblyssauro/blob/main/imgs/ptero_chao.png)
 ![obstáculo pterodáctilo no alto do jogo](https://github.com/natalzera/SSC0119-Assemblyssauro/blob/main/imgs/ptero_alto.png)
 
+Contudo, se o dinossauro acabar colidindo com algum obstáculo no jogo, o jogador será direcionado para a tela de fim, que atualiza e mostra o melhor score já feito pelo jogador desde o início do jogo, e poderá escolher entre jogar novamente (apertando a tecla de espaço) ou sair (apertando a tecla esc).
+
+![menu de fim do jogo](https://github.com/natalzera/SSC0119-Assemblyssauro/blob/main/imgs/menu_fim.png)
+
+Visto isso, temos uma pequena demostração do jogo funcionando no simulador com essas características descritas:
+
 ![asmssauro funcionando no simulador](https://github.com/natalzera/SSC0119-Assemblyssauro/blob/main/imgs/DinoGameDEMO.gif)
