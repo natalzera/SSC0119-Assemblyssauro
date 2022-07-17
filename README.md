@@ -31,15 +31,15 @@ Para essa funcionalidade funcionar, primeiramente ela é adicionada no montador 
 No "defs.h"
 ```C
 // código da instrução interpretado pelo montador
-#define MOV_STORE_CODE          98
+#define MOV_STORE_CODE 98
 // ...
 
 // como a instrução será chamada no assembly
-#define MOV_STORE_STR           "MOVST"
+#define MOV_STORE_STR "MOVST"
 // ...
 
 // opcode da instrução
-#define MOVSTORE        "110111"
+#define MOVSTORE "110111"
 // ...
 ```
 
@@ -86,10 +86,10 @@ Visto isso, com o montador possibilitando a geração do código binário da nov
 
 ```vhd
 -- opcode da instrução
-CONSTANT MOVSTORE	: STD_LOGIC_VECTOR(5 downto 0) := "110111";
+CONSTANT MOVSTORE: STD_LOGIC_VECTOR(5 downto 0) := "110111";
 -- ...
 
--- no estado de decodificação
+-- no estado de decodificação da máquina de controle
 IF(IR(15 DOWNTO 10) = MOVSTORE) THEN
         M4 := Reg(Rx);	-- pega o endereço da memória guardado no RX
         M1 <= M4;
@@ -99,12 +99,14 @@ IF(IR(15 DOWNTO 10) = MOVSTORE) THEN
 
         state := exec;
 END IF;
+-- ...
 
--- no estado de execução
+-- no estado de execução da máquina de controle
 IF(IR(15 DOWNTO 10) = MOVSTORE) THEN
         M4 := Reg(Ry);  -- Manda o valor de RY para RX
         selM2 := sM4;
         loadReg(Rx) := '1';
         state := fetch;
 END IF;
+-- ...
 ```
