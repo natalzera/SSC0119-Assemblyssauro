@@ -2,7 +2,7 @@
 ;                - DINO GAME -
 ; ---------------------------------------------
 ; by Victor Cologni Seles      Nº USP: 11795398
-; and Gabriel Natal Coutinho   Nº USP: XXXXXXXX
+; and Gabriel Natal Coutinho   Nº USP: 12543461
 
 jmp main
 
