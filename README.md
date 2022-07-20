@@ -166,3 +166,7 @@ Contudo, se o dinossauro acabar colidindo com algum obstáculo no jogo, o jogado
 Visto isso, temos uma pequena demostração do jogo funcionando no simulador com essas características descritas:
 
 ![asmssauro funcionando no simulador](https://github.com/natalzera/SSC0119-Assemblyssauro/blob/main/imgs/DinoGameDEMO.gif)
+
+## Links
+**Link para a apresentação do trabalho:** https://drive.google.com/file/d/1v_aco1JCabBFFJBsenF5vWEnIfbmDapa/view?usp=sharing
+**Link para a demonstração do jogo:** https://drive.google.com/file/d/1gc9TPCm9jlV5Zz5TtcIH9g5tf83VkVnd/view?usp=sharing
